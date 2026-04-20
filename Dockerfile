@@ -12,5 +12,6 @@ ENV RUSTFLAGS="-C link-arg=-fuse-ld=mold"
 
 COPY Cargo.toml Cargo.lock ./
 COPY src ./src
+COPY migrations ./migrations
 
-CMD ["cargo", "watch", "-w", "src", "-x", "run"]
+CMD ["cargo", "watch", "-w", "src", "-w", "migrations", "-x", "run"]
