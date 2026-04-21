@@ -13,10 +13,23 @@ use slug::slugify;
 use sqlx::PgPool;
 use ulid::Ulid;
 
+/// List all todos
+///
+/// Returns all todos in the database.
+///
+/// The request must include a valid Bearer token in the Authorization header for authentication
+/// (use the `/auth/signup` or `/auth/signin` endpoint to obtain a token).
 #[utoipa::path(
     get,
     path = "/todos",
-    responses((status = 200, description = "List of todos", body = Vec<Todo>)),
+    params(
+        ("Authorization" = String, Header, description = "Bearer access token. Format: `Bearer <token>`")
+    ),
+    security(("bearerAuth" = [])),
+    responses(
+        (status = 200, description = "List of todos", body = Vec<Todo>),
+        (status = 401, description = "Unauthorized", body = crate::error::ErrorResponse),
+    ),
     tag = "todos"
 )]
 pub async fn list_todos(
@@ -32,12 +45,26 @@ pub async fn list_todos(
     Ok(Json(todos))
 }
 
+/// Create a new todo
+///
+/// Creates a new todo with a unique slug generated from the title.
+///
+/// If a slug collision occurs, it will attempt to generate a new slug up to 3 times
+/// before returning a conflict error.
+///
+/// The request must include a valid Bearer token in the Authorization header for authentication
+/// (use the `/auth/signup` or `/auth/signin` endpoint to obtain a token).
 #[utoipa::path(
     post,
     path = "/todos",
     request_body = CreateTodo,
+    params(
+        ("Authorization" = String, Header, description = "Bearer access token. Format: `Bearer <token>`")
+    ),
+    security(("bearerAuth" = [])),
     responses(
         (status = 201, description = "Todo created", body = Todo),
+        (status = 401, description = "Unauthorized", body = crate::error::ErrorResponse),
         (status = 409, description = "Slug already exists", body = crate::error::ErrorResponse),
     ),
     tag = "todos"
@@ -70,11 +97,23 @@ pub async fn create_todo(
     Ok((StatusCode::CREATED, Json(todo)))
 }
 
+/// Get a todo by ID
+///
+/// Returns a single todo identified by its ID.
+///
+/// The request must include a valid Bearer token in the Authorization header for authentication
+/// (use the `/auth/signup` or `/auth/signin` endpoint to obtain a token).
 #[utoipa::path(
     get,
     path = "/todos/{id}",
+    params(
+        ("id" = String, Path, description = "The todo ID"),
+        ("Authorization" = String, Header, description = "Bearer access token. Format: `Bearer <token>`")
+    ),
+    security(("bearerAuth" = [])),
     responses(
         (status = 200, description = "Todo found", body = Todo),
+        (status = 401, description = "Unauthorized", body = crate::error::ErrorResponse),
         (status = 404, description = "Todo not found", body = crate::error::ErrorResponse),
     ),
     tag = "todos"
@@ -95,12 +134,26 @@ pub async fn get_todo(
     Ok(Json(todo))
 }
 
+/// Update a todo
+///
+/// Updates the title, description, and completed status of an existing todo.
+/// The slug is regenerated from the new title. If a slug collision occurs, it will
+/// attempt to generate a new slug up to 3 times before returning a conflict error.
+///
+/// The request must include a valid Bearer token in the Authorization header for authentication
+/// (use the `/auth/signup` or `/auth/signin` endpoint to obtain a token).
 #[utoipa::path(
     put,
     path = "/todos/{id}",
     request_body = UpdateTodo,
+    params(
+        ("id" = String, Path, description = "The todo ID"),
+        ("Authorization" = String, Header, description = "Bearer access token. Format: `Bearer <token>`")
+    ),
+    security(("bearerAuth" = [])),
     responses(
         (status = 200, description = "Todo updated", body = Todo),
+        (status = 401, description = "Unauthorized", body = crate::error::ErrorResponse),
         (status = 404, description = "Todo not found", body = crate::error::ErrorResponse),
         (status = 409, description = "Slug already exists", body = crate::error::ErrorResponse),
     ),
