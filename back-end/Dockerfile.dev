@@ -6,6 +6,7 @@ RUN rustup component add rustc-codegen-cranelift
 WORKDIR /app
 
 RUN cargo install cargo-watch --locked
+RUN cargo install sqlx-cli --no-default-features --features postgres --locked
 
 ENV CARGO_TARGET_DIR=/app/target
 ENV RUSTFLAGS="-C link-arg=-fuse-ld=mold"
@@ -14,4 +15,4 @@ COPY Cargo.toml Cargo.lock ./
 COPY src ./src
 COPY migrations ./migrations
 
-CMD ["cargo", "watch", "-w", "src", "-w", "migrations", "-x", "run"]
+CMD sqlx migrate run && cargo watch -w src -w migrations -x run
