@@ -85,6 +85,14 @@ export interface CreateUser {
   role: UserRole;
 }
 
+export type Currency = typeof Currency[keyof typeof Currency];
+
+
+export const Currency = {
+  czk: 'czk',
+  eur: 'eur',
+} as const;
+
 /**
  * A single slice in a percentage breakdown.
  */
@@ -157,6 +165,22 @@ export interface InternalFeatures {
   priceListImport?: null | PriceListImport;
 }
 
+/**
+ * A single invoicing entry logged against a tenant.
+ */
+export interface InvoicingEntry {
+  created_at: string;
+  date: string;
+  id: string;
+  /** MongoDB ObjectId of the tenant this invoice belongs to. */
+  mongo_id: string;
+  /** @nullable */
+  note?: string | null;
+  /** Price in integer units (e.g. cents). */
+  price: number;
+  updated_at: string;
+}
+
 export type OnOff = typeof OnOff[keyof typeof OnOff];
 
 
@@ -164,6 +188,30 @@ export const OnOff = {
   ON: 'ON',
   OFF: 'OFF',
 } as const;
+
+/**
+ * A single onboarding entry logged against a tenant.
+ */
+export interface OnboardingEntry {
+  business_module: boolean;
+  created_at: string;
+  currency: Currency;
+  /** @nullable */
+  date_training?: string | null;
+  enigoo_involved: boolean;
+  fans_module: boolean;
+  id: string;
+  invoiced: boolean;
+  /** @nullable */
+  invoiced_date?: string | null;
+  /** MongoDB ObjectId of the tenant this onboarding belongs to. */
+  mongo_id: string;
+  /** @nullable */
+  note?: string | null;
+  paid: boolean;
+  price: number;
+  updated_at: string;
+}
 
 export interface Security {
   /** @nullable */
@@ -522,6 +570,31 @@ export interface UpdateUser {
   role: UserRole;
 }
 
+export interface UpsertInvoicingEntry {
+  date: string;
+  mongo_id: string;
+  /** @nullable */
+  note?: string | null;
+  price: number;
+}
+
+export interface UpsertOnboardingEntry {
+  business_module: boolean;
+  currency: Currency;
+  /** @nullable */
+  date_training?: string | null;
+  enigoo_involved: boolean;
+  fans_module: boolean;
+  invoiced: boolean;
+  /** @nullable */
+  invoiced_date?: string | null;
+  mongo_id: string;
+  /** @nullable */
+  note?: string | null;
+  paid: boolean;
+  price: number;
+}
+
 export interface UpsertTenantNote {
   /** @nullable */
   note?: string | null;
@@ -539,4 +612,16 @@ export interface User {
   role: UserRole;
   slug: string;
 }
+
+export type ListInvoicingEntriesForMonthParams = {
+/**
+ * Calendar year, e.g. `2025`.
+ */
+year: number;
+/**
+ * Calendar month (1–12).
+ * @minimum 0
+ */
+month: number;
+};
 

@@ -1,6 +1,8 @@
 pub mod auth;
 pub mod billing;
 pub mod finance_plan;
+pub mod invoicing;
+pub mod onboarding;
 pub mod tenant_notes;
 pub mod tenants;
 pub mod users;
@@ -30,6 +32,8 @@ use crate::{auth::AuthService, db::DatabaseService, mongo::MongoService};
         (name = "Finance Plan", description = "Admin finance plan entries used to build the income graph"),
         (name = "Billing", description = "Admin billing entries defining plan prices per fan count threshold"),
         (name = "Tenant Notes", description = "Admin notes attached to individual tenants"),
+        (name = "Admin Invoicing", description = "Invoicing entries logged per tenant, supports backdating"),
+        (name = "Admin Onboarding", description = "Onboarding entries logged per tenant"),
     ),
     modifiers(&SecurityAddon),
 )]
@@ -117,6 +121,23 @@ pub fn build_router(db: DatabaseService, auth: AuthService, mongo: MongoService,
             tenant_notes::get_tenant_note,
             tenant_notes::upsert_tenant_note,
             tenant_notes::delete_tenant_note
+        ))
+        .routes(routes!(invoicing::list_all_invoicing_entries))
+        .routes(routes!(invoicing::list_invoicing_entries))
+        .routes(routes!(invoicing::list_invoicing_entries_for_month))
+        .routes(routes!(invoicing::create_invoicing_entry))
+        .routes(routes!(
+            invoicing::get_invoicing_entry,
+            invoicing::upsert_invoicing_entry,
+            invoicing::delete_invoicing_entry
+        ))
+        .routes(routes!(onboarding::list_all_onboarding_entries))
+        .routes(routes!(onboarding::list_onboarding_entries))
+        .routes(routes!(onboarding::create_onboarding_entry))
+        .routes(routes!(
+            onboarding::get_onboarding_entry,
+            onboarding::upsert_onboarding_entry,
+            onboarding::delete_onboarding_entry
         ))
         .with_state(AppState { db, auth, mongo })
         .split_for_parts();

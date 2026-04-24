@@ -3,7 +3,7 @@
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import * as Avatar from '$lib/components/ui/avatar/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import { Users, Building2, LogOut, ChevronsUpDown, ChevronRight, TrendingUp, FileText, Wallet, LayoutDashboard } from '@lucide/svelte';
+	import { Users, Building2, LogOut, ChevronsUpDown, ChevronRight, TrendingUp, FileText, Wallet, TableOfContents, GraduationCap, LayoutDashboard } from '@lucide/svelte';
 	import * as Collapsible from '$lib/components/ui/collapsible/index.js';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
@@ -37,8 +37,10 @@
 
 	const financesItems = [
 		{ href: '/finances/overview', label: 'Overview', icon: LayoutDashboard },
+		{ href: '/finances/invoices', label: 'Invoices', icon: TableOfContents },
 		{ href: '/finances/plan', label: 'Plan', icon: TrendingUp },
-		{ href: '/finances/billing', label: 'Billing', icon: FileText }
+		{ href: '/finances/billing', label: 'Billing', icon: FileText },
+		{ href: '/finances/onboarding', label: 'Onboarding', icon: GraduationCap }
 	];
 </script>
 

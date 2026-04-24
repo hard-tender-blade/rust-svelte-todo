@@ -156,6 +156,75 @@ pub struct UpdateBillingEntry {
     pub individual_plan_price: bool,
 }
 
+// ── Admin Invoicing ───────────────────────────────────────────────────────────
+
+/// A single invoicing entry logged against a tenant.
+#[derive(Serialize, Deserialize, ToSchema, Clone, sqlx::FromRow)]
+pub struct InvoicingEntry {
+    pub id: String,
+    /// MongoDB ObjectId of the tenant this invoice belongs to.
+    pub mongo_id: String,
+    pub date: NaiveDate,
+    /// Price in integer units (e.g. cents).
+    pub price: i32,
+    pub note: Option<String>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
+
+#[derive(Deserialize, ToSchema)]
+pub struct UpsertInvoicingEntry {
+    pub mongo_id: String,
+    pub date: NaiveDate,
+    pub price: i32,
+    pub note: Option<String>,
+}
+
+// ── Admin Onboarding ─────────────────────────────────────────────────────────
+
+#[derive(Debug, Serialize, Deserialize, ToSchema, Clone, sqlx::Type, PartialEq, Eq)]
+#[sqlx(type_name = "currencies", rename_all = "lowercase")]
+#[serde(rename_all = "lowercase")]
+pub enum Currency {
+    Czk,
+    Eur,
+}
+
+/// A single onboarding entry logged against a tenant.
+#[derive(Serialize, Deserialize, ToSchema, Clone, sqlx::FromRow)]
+pub struct OnboardingEntry {
+    pub id: String,
+    /// MongoDB ObjectId of the tenant this onboarding belongs to.
+    pub mongo_id: String,
+    pub date_training: Option<NaiveDate>,
+    pub paid: bool,
+    pub price: i32,
+    pub currency: Currency,
+    pub invoiced: bool,
+    pub invoiced_date: Option<NaiveDate>,
+    pub business_module: bool,
+    pub fans_module: bool,
+    pub note: Option<String>,
+    pub enigoo_involved: bool,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
+
+#[derive(Deserialize, ToSchema)]
+pub struct UpsertOnboardingEntry {
+    pub mongo_id: String,
+    pub date_training: Option<NaiveDate>,
+    pub paid: bool,
+    pub price: i32,
+    pub currency: Currency,
+    pub invoiced: bool,
+    pub invoiced_date: Option<NaiveDate>,
+    pub business_module: bool,
+    pub fans_module: bool,
+    pub note: Option<String>,
+    pub enigoo_involved: bool,
+}
+
 // ── Tenant Notes ──────────────────────────────────────────────────────────────
 
 /// A free-text admin note attached to a specific tenant (identified by its MongoDB ObjectId).
